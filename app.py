@@ -20,8 +20,8 @@ app = Flask(
 app.secret_key = os.getenv('SECRET_KEY') or 'change-this-secret-key'
 
 # ===== Rate limit: 10 сообщений / секунду с одного IP =====
-RATE_LIMIT_COUNT = 10
-RATE_LIMIT_SECONDS = 1
+RATE_LIMIT_COUNT = 1
+RATE_LIMIT_SECONDS = 30
 _rate_limit_store = defaultdict(list)
 _rate_limit_lock = threading.Lock()
 
@@ -77,13 +77,13 @@ IP: {ip}
     msg.attach(MIMEText(body, 'plain', 'utf-8'))
 
     try:
-        with smtplib.SMTP(mail_server, mail_port, timeout=15) as server:
+        with smtplib.SMTP(mail_server, mail_port, timeout=20) as server:
             server.starttls()
             server.login(mail_user, mail_password)
             server.send_message(msg)
         return True
     except Exception as e:
-        print('Ошибка отправки email:', e)
+        print('Ошибка отправки email:', repr(e))
         return False
 
 
