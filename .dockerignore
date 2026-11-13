@@ -6,3 +6,9 @@ venv/
 .idea/
 .vscode/
 data/messages.txt
+#Let's enctrypt/
+certbot
+certbot/conf/
+certbot/www/
+
+*.pem

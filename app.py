@@ -150,28 +150,11 @@ def submit_contact():
             'error': 'Слишком длинные данные.'
         }), 400
 
-    # Сохраняем в файл
-    saved = False
-    try:
-        os.makedirs('data', exist_ok=True)
-        with open('data/messages.txt', 'a', encoding='utf-8') as f:
-            f.write(
-                f"[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] "
-                f"IP: {ip}\n"
-                f"Имя: {name}\n"
-                f"Email: {email}\n"
-                f"Телефон: {phone or '—'}\n"
-                f"Вопрос: {question}\n"
-                f"{'-' * 60}\n"
-            )
-        saved = True
-    except Exception as e:
-        print('Ошибка записи в файл:', e)
 
     # Отправляем на почту
     email_sent = send_contact_email(name, email, phone, question, ip)
 
-    if not email_sent and not saved:
+    if not email_sent:
         return jsonify({
             'ok': False,
             'error': 'Не удалось отправить сообщение. Попробуйте позже.'
