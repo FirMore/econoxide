@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Установки - ХимСтарт{% endblock %}
+
+{% block content %}
+<section class="page-section">
+    <div class="content-box">
+
+        <h1 class="page-title">Инженерная разработка</h1>
+
+        <div class="ustanovka-block">
+            <h1>Установка под Ваш запрос</h1>
+            
+            <p>
+            Можем разработать технологию производства и собрать для Вас автоматизированную установку под синтез конкретного органического вещества. 
+            Свяжитесь с нами для обсуждения деталей индивидуальной задачи. 
+            </p>
+
+            <button type="button" class="ustanovka-btn" id="openContactFromUstanovka">
+                Обсудить задачу
+            </button>
+
+            <div class="ustanovka-image">
+                <img src="{{ url_for('static', filename='images/ustanovka.jpg') }}" 
+                     alt="Установка">
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}

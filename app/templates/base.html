@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}ООО "Эко-Н-Оксид"{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+</head>
+
+
+<!-- Плавающая кнопка (облачко) -->
+<button id="openContactBtn" class="floating-btn" title="Задать вопрос">
+    💬
+</button>
+
+<!-- Всплывающее окно -->
+<div id="contactModal" class="contact-modal">
+    <div class="modal-content">
+        <button class="close-btn" id="closeContactBtn">&times;</button>
+        
+        <h3>Отправить вопрос</h3>
+        <p class="subtitle">Мы ответим вам в ближайшее время</p>
+        
+        <form id="contactForm">
+            <div class="form-group">
+                <input type="text" name="name" placeholder="Ваше имя" required>
+            </div>
+            <div class="form-group">
+                <input type="email" name="email" placeholder="Ваш email" required>
+            </div>
+            <div class="form-group">
+                <input type="tel" name="phone" placeholder="Телефон">
+            </div>
+            <div class="form-group">
+                <textarea name="question" placeholder="Ваш вопрос" rows="4" required></textarea>
+            </div>
+
+            <div class="form-consent">
+                <label>
+                    <input type="checkbox" name="consent" id="consentCheckbox" required>
+                    <span>
+                        Я согласен на 
+                        <a href="/privacy" target="_blank">обработку персональных данных</a>
+                    </span>
+                </label>
+            </div>
+
+            <button type="submit" class="submit-btn">Отправить</button>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const consent = document.getElementById('consentCheckbox');
+
+    if (consent) {
+        consent.addEventListener('invalid', function () {
+            this.setCustomValidity('Дайте согласие на обработку персональных данных');
+        });
+
+        consent.addEventListener('change', function () {
+            this.setCustomValidity('');
+        });
+    }
+});
+</script>
+<script>
+const openBtn = document.getElementById('openContactBtn');
+const closeBtn = document.getElementById('closeContactBtn');
+const modal = document.getElementById('contactModal');
+const form = document.getElementById('contactForm');
+
+openBtn.addEventListener('click', () => {
+    modal.classList.add('active');
+});
+
+closeBtn.addEventListener('click', () => {
+    modal.classList.remove('active');
+});
+
+// Закрытие по клику вне окна
+document.addEventListener('click', (e) => {
+    const openFromUstanovka = document.getElementById('openContactFromUstanovka');
+
+    if (
+        modal.classList.contains('active') &&
+        !modal.contains(e.target) &&
+        e.target !== openBtn &&
+        e.target !== openFromUstanovka &&
+        !openFromUstanovka?.contains(e.target)
+    ) {
+        modal.classList.remove('active');
+    }
+});
+
+
+
+// Отправка формы (AJAX)
+form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    const consent = document.getElementById('consentCheckbox');
+    if (!consent.checked) {
+        showToast('Необходимо согласие на обработку персональных данных', 'error');
+        return;
+    }
+    
+    const button = this.querySelector('button');
+    const originalText = button.textContent;
+    button.textContent = 'Отправляем...';
+    button.disabled = true;
+
+    const formData = new FormData(this);
+
+    try {
+        const response = await fetch('/submit_contact', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            showToast('✅ Спасибо! Ваш вопрос доставлен.');
+            this.reset();
+            modal.classList.remove('active');
+        } else {
+            showToast('❌ Ошибка. Попробуйте ещё раз.', 'error');
+        }
+    } catch (err) {
+        showToast('❌ Ошибка соединения.', 'error');
+    }
+
+    button.textContent = originalText;
+    button.disabled = false;
+});
+
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        position: fixed;
+        bottom: 100px;
+        right: 30px;
+        background: ${type === 'success' ? '#27ae60' : '#e74c3c'};
+        color: white;
+        padding: 14px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        z-index: 10001;
+        font-size: 15px;
+        opacity: 0;
+        transition: opacity 0.3s;
+    `;
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    setTimeout(() => toast.style.opacity = '1', 10);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+    }, 3500);
+}
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const slides = [
+        "{{ url_for('static', filename='presentation/slide-1.png') }}",
+        "{{ url_for('static', filename='presentation/slide-2.png') }}",
+        "{{ url_for('static', filename='presentation/slide-3.png') }}",
+        "{{ url_for('static', filename='presentation/slide-4.png') }}"
+    ];
+
+    const img = document.getElementById('slideImage');
+    const dotsBox = document.getElementById('sliderDots');
+    const prevBtn = document.getElementById('prevSlide');
+    const nextBtn = document.getElementById('nextSlide');
+    const fsBtn = document.getElementById('fullscreenBtn');
+    const wrapper = document.querySelector('.slider-wrapper');
+
+    if (!img || !prevBtn || !nextBtn) return;
+
+    let current = 0;
+
+    function renderDots() {
+        if (!dotsBox) return;
+        dotsBox.innerHTML = '';
+        slides.forEach((_, i) => {
+            const dot = document.createElement('span');
+            if (i === current) dot.classList.add('active');
+            dot.addEventListener('click', () => goTo(i));
+            dotsBox.appendChild(dot);
+        });
+    }
+
+    function goTo(index) {
+        current = (index + slides.length) % slides.length;
+        img.style.opacity = '0';
+        setTimeout(() => {
+            img.src = slides[current];
+            img.style.opacity = '1';
+            renderDots();
+        }, 200);
+    }
+
+    prevBtn.addEventListener('click', () => goTo(current - 1));
+    nextBtn.addEventListener('click', () => goTo(current + 1));
+
+    if (fsBtn && wrapper) {
+        fsBtn.addEventListener('click', () => {
+            if (!document.fullscreenElement) {
+                wrapper.requestFullscreen?.() || wrapper.webkitRequestFullscreen?.();
+            } else {
+                document.exitFullscreen?.() || document.webkitExitFullscreen?.();
+            }
+        });
+    }
+
+    // Клавиатура
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') goTo(current - 1);
+        if (e.key === 'ArrowRight') goTo(current + 1);
+        if (e.key === 'f' || e.key === 'F') fsBtn?.click();
+    });
+
+    renderDots();
+});
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const items = document.querySelectorAll('.faq-item');
+
+    items.forEach(item => {
+        const question = item.querySelector('.faq-question');
+
+        question.addEventListener('click', () => {
+            // Закрываем все остальные
+            items.forEach(other => {
+                if (other !== item) {
+                    other.classList.remove('active');
+                }
+            });
+
+            // Открываем / закрываем текущий
+            item.classList.toggle('active');
+        });
+    });
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btn = document.getElementById('openContactFromUstanovka');
+    const openBtn = document.getElementById('openContactBtn'); // твоя плавающая кнопка
+
+    if (btn && openBtn) {
+        btn.addEventListener('click', function() {
+            openBtn.click(); // открываем то же окно обратной связи
+        });
+    }
+});
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const burger = document.getElementById('burgerBtn');
+    const navRight = document.getElementById('navRight');
+
+    if (burger && navRight) {
+        burger.addEventListener('click', function () {
+            navRight.classList.toggle('open');
+            burger.textContent = navRight.classList.contains('open') ? '✕' : '☰';
+        });
+
+        // Закрывать меню при клике на пункт
+        navRight.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                navRight.classList.remove('open');
+                burger.textContent = '☰';
+            });
+        });
+    }
+});
+</script>
+
+<body>
+    <nav class="main-nav">
+        <!-- Левая белая часть с логотипами -->
+        <div class="nav-left">
+            <a href="{{ url_for('home') }}">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" 
+                    alt="ООО Эко-Н-Оксид" 
+                    class="head-company-logo">
+            </a>
+
+            <a href="https://fasie.ru" target="_blank" rel="noopener">
+                <img src="{{ url_for('static', filename='images/Fond_sodeystviya_innovatsiyam_2.png') }}" 
+                    alt="Фонд содействия инновациям" 
+                    class="fsi-logo">
+            </a>
+        </div>
+
+        <!-- Кнопка бургер (видна только на мобильных) -->
+        <button class="burger" id="burgerBtn" aria-label="Меню">
+            ☰
+        </button>
+
+        <!-- Правая синяя трапеция с меню -->
+        <div class="nav-right" id="navRight">
+            <ul class="nav-menu">
+                <li><a href="{{ url_for('home') }}">Главная</a></li>
+                <li><a href="{{ url_for('products') }}">Заказной синтез</a></li>
+                <li><a href="{{ url_for('ustanovki') }}">Установки</a></li>
+                <li><a href="{{ url_for('sending') }}">Доставка и оплата</a></li>
+                <li><a href="{{ url_for('about') }}">О нас</a></li>
+                <li><a href="{{ url_for('faq') }}">FAQ</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+        <div class="footer-inner">
+            
+            <p class="footer-support-text">
+                Проект реализован при поддержке Фонда содействия инновациям
+                в рамках программы «Студенческий стартап» мероприятия
+                «Платформа университетского технологического предпринимательства»
+                федерального проекта «Технологии»
+            </p>
+
+            <div class="footer-logos">
+                <a href="https://fasie.ru" target="_blank" rel="noopener">
+                    <img src="{{ url_for('static', filename='images/Fond_sodeystviya_innovatsiyam_2.png') }}" 
+                        alt="Фонд содействия инновациям" 
+                        class="fsi-logo-footer">
+                </a>
+
+                <!-- Второй фонд -->
+                <a href="https://univertechpred.ru/" target="_blank" rel="noopener">
+                    <img src="{{ url_for('static', filename='images/second-fond.png') }}" 
+                        alt="Второй фонд" 
+                        class="fsi-logo-footer">
+                </a>
+            </div>
+
+            <p class="footer-copy">
+                © 2026 ООО "Эко-Н-Оксид". Все права защищены.
+            </p>
+
+        </div>
+    </footer>
+<script>
+document.getElementById('contactForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const button = this.querySelector('button');
+    const originalText = button.textContent;
+    
+    button.textContent = 'Отправляем...';
+    button.disabled = true;
+
+    try {
+        const response = await fetch('/submit_contact', {
+            method: 'POST',
+            body: formData
+        });
+        
+        if (response.ok) {
+            // Показываем красивое уведомление
+            showToast('✅ Спасибо! Ваш вопрос доставлен. Мы скоро ответим.');
+            this.reset(); // очищаем форму
+        } else {
+            showToast('❌ Что-то пошло не так. Попробуйте ещё раз.', 'error');
+        }
+    } catch (error) {
+        showToast('❌ Ошибка соединения. Попробуйте позже.', 'error');
+    }
+    
+    button.textContent = originalText;
+    button.disabled = false;
+});
+
+// Функция всплывающего уведомления
+function showToast(message, type = 'success') {
+    const toast = document.createElement('div');
+    toast.style.position = 'fixed';
+    toast.style.bottom = '20px';
+    toast.style.right = '20px';
+    toast.style.background = type === 'success' ? '#27ae60' : '#e74c3c';
+    toast.style.color = 'white';
+    toast.style.padding = '14px 20px';
+    toast.style.borderRadius = '8px';
+    toast.style.boxShadow = '0 4px 15px rgba(0,0,0,0.2)';
+    toast.style.zIndex = '10000';
+    toast.style.fontSize = '16px';
+    toast.style.opacity = '0';
+    toast.style.transition = 'all 0.3s';
+    toast.textContent = message;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => toast.style.opacity = '1', 10);
+    setTimeout(() => {
+        toast.style.opacity = '0';
+        setTimeout(() => toast.remove(), 300);
+    }, 4000);
+}
+</script>
+</body>
+
+
+</html>

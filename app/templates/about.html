@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}О нас - ООО "Эко-Н-Оксид"{% endblock %}
+
+{% block content %}
+<section class="about-page">
+    <div class="about-container">
+
+        <!-- Заголовок -->
+        <h1 class="about-title">О нас</h1>
+
+        <div class="about-cards">
+            <a href="#presentation" class="about-card">
+                <div class="card-circle">
+                    <img src="{{ url_for('static', filename='images/about/icon-presentation.jpg') }}" alt="Презентация">
+                </div>
+                <div class="card-text">Посмотреть презентацию</div>
+            </a>
+
+            <a href="{{ url_for('products') }}" class="about-card">
+                <div class="card-circle">
+                    <img src="{{ url_for('static', filename='images/about/icon-synthesis.jpg') }}" alt="Заказной синтез">
+                </div>
+                <div class="card-text">Заказной синтез</div>
+            </a>
+
+            <a href="{{ url_for('sending') }}" class="about-card">
+                <div class="card-circle">
+                    <img src="{{ url_for('static', filename='images/about/icon-delivery1.jpg') }}" alt="Доставка">
+                </div>
+                <div class="card-text">Доставка и оплата</div>
+            </a>
+
+            <a href="{{ url_for('faq') }}" class="about-card" id="openQuestions">
+                <div class="card-circle">
+                    <img src="{{ url_for('static', filename='images/about/icon-questions.jpg') }}" alt="Вопросы">
+                </div>
+                <div class="card-text">Вопросы</div>
+            </a>
+        </div>
+
+        <!-- Описание компании (сюда вставишь свой текст) -->
+        <div class="about-description">
+            <h4>О нас</h4>
+            <p>
+                ООО «Эко-Н-Оксид» - новая компания на рынке химического сырья в России. 
+                Мы можем реализовать реакцию окисления под заданный субстрат, выполнить на заказ органический синтез высокой сложности, 
+                разработать технологию производства вещества под Вашу конкретную задачу и собрать установку для этого.
+            </p>
+            <h4>Наши цели</h4>
+
+            <p>
+                - Обеспечивать индивидуальный подход к каждому клиенту, глубоко изучая его задачи и предлагая оптимальные технические и коммерческие решения.   <br>
+                - Гарантировать своевременные поставки продукции в необходимых объёмах при строгом соблюдении стандартов качества, включая обязательный входной контроль сырья и материалов. <br>  
+                - Постоянно внедрять современные производственные технологии и расширять ассортимент за счёт освоения новых видов химической продукции.   <br>
+                - Поддерживать гибкую ценовую политику и высокий уровень лояльности к постоянным партнёрам.   <br>
+                - Обеспечивать качественный сопутствующий сервис благодаря слаженной работе профессиональной команды.
+            </p>
+        </div>
+
+        <!-- Блок поддержки ФСИ -->
+        <div class="about-support">
+            <p>Проект поддержан Фондом содействия инновациям</p>
+            <a href="https://fasie.ru" target="_blank" rel="noopener">
+                <img src="{{ url_for('static', filename='images/Fond_sodeystviya_innovatsiyam_2.png') }}" 
+                     alt="Фонд содействия инновациям" 
+                     class="fsi-logo-about">
+            </a>
+        </div>
+
+        <!-- Секция презентации (внизу страницы) -->
+        <div id="presentation" class="presentation-section">
+            <h2>Презентация компании</h2>
+
+            <div class="slider-wrapper">
+                <div class="slider" id="slider">
+                    <button class="slider-btn prev" id="prevSlide">‹</button>
+                    
+                    <div class="slider-viewport" id="sliderViewport">
+                        <!-- Только ОДНА картинка -->
+                        <img id="slideImage" 
+                            src="{{ url_for('static', filename='presentation/slide-1.png') }}" 
+                            alt="Слайд">
+                    </div>
+                    
+                    <button class="slider-btn next" id="nextSlide">›</button>
+                </div>
+
+                <div class="slider-controls">
+                    <div class="slider-dots" id="sliderDots"></div>
+                    
+                    <div class="slider-actions">
+                        <button id="fullscreenBtn" class="control-btn" title="Полный экран">⛶</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+{% endblock %}
