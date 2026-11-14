@@ -668,7 +668,7 @@ footer strong {
     margin-left: 5%;
     color: #17112f;
     align-items: justify;
-    flex: 1;             /* чуть шире текстовая часть */
+    flex: 1.2;             
     font-size: 1.2rem;
 }
 
@@ -684,6 +684,30 @@ footer strong {
 @media (max-width: 768px) {
     .two-columns {
         flex-direction: column;
+    }
+}
+
+/* Только средние экраны (маленькие ноутбуки) */
+@media (max-width: 1400px) and (min-width: 900px) {
+    .two-columns {
+        gap: 20px;
+    }
+
+    .column-text {
+        flex: 1.05;
+        margin-left: 2%;
+        margin-right: 2%;
+    }
+
+    .column-image {
+        flex: 1.2;
+        min-width: 360px;   /* не даём картинке сильно сжаться */
+    }
+
+    .column-image img {
+        width: 100%;
+        max-width: none;    /* если где-то был max-width */
+        height: auto;
     }
 }
 
