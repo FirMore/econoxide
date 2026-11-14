@@ -648,17 +648,19 @@ footer strong {
 
 .two-columns {
     display: flex;
+    align-items: flex-start;
     gap: 30px;
 }
 
 .column-image {
     display: flex;
-    align-items: justify;
+    align-items: flex-start;
     justify-content: center;
 }
 
 .column-image img {
     width: 80%;
+    max-width: 100%;
     height: auto;
     display: block;
     border-radius: 12px;
